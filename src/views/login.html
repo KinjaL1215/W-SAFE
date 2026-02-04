@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login</title>
+<link rel="stylesheet" href="/public/login.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Welcome to W-SAFE</h2>
+    <p class="paragraph">
+        Login to continue and access your safety tools
+    </p>
+
+    <form action="/login" method="POST">
+
+        <label>Email</label>
+        <input type="email" name="email" placeholder="Enter your email" required>
+
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Enter your password" required>
+
+        <button type="submit">Login</button>
+
+    </form>
+    <p class="bottom-text">
+    Don’t have an account?
+    <a href="/signup">Create account</a>
+</p>
+
+</div>
+
+</body>
+</html>
