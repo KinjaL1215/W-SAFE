@@ -1,0 +1,154 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Background */
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #fdeff2, #f3edff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Wrapper */
+.main-container {
+    width: 100%;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Main Card */
+.card {
+    width: 100%;
+    max-width: 1100px;
+    text-align: center;
+    padding: 20px;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+}
+/* HERO — center always */
+.hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+#logo{
+    border-radius: 20px;
+}
+
+/* Logo */
+.logo-section img {
+    width: 120px;
+    margin-bottom: 8px;
+}
+
+/* Title */
+.title-section h1 {
+    font-size: 40px;
+    color: #e45a84;
+    margin-bottom: 6px;
+}
+
+/* Tagline */
+.tagline {
+    font-size: 17px;
+    color: #4c4343;
+    margin-bottom: 28px;
+}
+
+/* Button */
+.btn-primary {
+    padding: 16px 42px;
+    font-size: 16px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #e04872, #8b5cf6);
+    color: #ffffff;
+    border: none;
+    border-radius: 45px;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(224, 72, 114, 0.35);
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 34px rgba(139, 92, 246, 0.45);
+}
+
+/* ===== FEATURES GRID — ALWAYS 2×2 ===== */
+.info-section {
+    margin-top: 60px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+}
+
+/* Feature Card */
+.info-card {
+    background: rgba(255,255,255,0.9);
+    padding: 26px;
+    border-radius: 22px;
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    text-align: left;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+    transition: 0.3s;
+}
+
+.info-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 36px rgba(0,0,0,0.12);
+}
+
+/* Icon circle */
+.icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+/* Icon Colors */
+.icon.sos { background:#fde2e7; color:#d90429; }
+.icon.location { background:#ede9fe; color:#7c3aed; }
+.icon.contacts { background:#e6f4ea; color:#2e7d32; }
+.icon.helpline { background:#fff3e0; color:#ef6c00; }
+
+/* Text */
+.info-text h3 {
+    font-size: 17px;
+    margin-bottom: 6px;
+    color: #222;
+}
+
+.info-text p {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+}
+
+/* Mobile → 1 per line */
+@media (max-width: 768px) {
+    .info-section {
+        grid-template-columns: 1fr;
+    }
+
+    .btn-primary {
+        width: 100%;
+        max-width: 320px;
+    }
+}
