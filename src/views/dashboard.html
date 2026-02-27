@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>W-SAFE Dashboard</title>
+    <link rel="stylesheet" href="/public/dashboard.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <h2>W-SAFE</h2>
+
+    <div class="nav-right">
+
+        <!-- PROFILE -->
+        <div class="profile" onclick="toggleMenu()">
+            <img id="profileImg">
+            <div id="avatar" class="avatar"></div>
+            <span id="username">User</span>
+        </div>
+
+        <!-- DROPDOWN -->
+        <div id="dropdown" class="dropdown">
+            <a href="#" onclick="openEditProfile()">Edit Profile</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<!-- MAIN -->
+<div class="container">
+
+    <h1>Dashboard</h1>
+
+    <div class="card emergency">
+        <h2>🚨 Emergency Help</h2>
+        <button onclick="sendSOS()">Send SOS</button>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h3>📍 Share Location</h3>
+            <button onclick="shareLocation()">Share</button>
+        </div>
+
+        <div class="card">
+            <h3>📞 Emergency Contacts</h3>
+            <button>View</button>
+        </div>
+
+        <div class="card">
+            <h3>🛡 Safety Tips</h3>
+            <button>Read</button>
+        </div>
+
+        <div class="card">
+            <h3>📢 Report Incident</h3>
+            <button>Report</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- EDIT PROFILE MODAL -->
+<div id="editModal" class="modal">
+
+    <div class="modal-content">
+        <span class="close" onclick="closeEditProfile()">&times;</span>
+
+        <h2>Edit Profile</h2>
+
+        <!-- NAME -->
+        <input type="text" id="editName" placeholder="Enter new name">
+
+        <!-- IMAGE -->
+        <input type="file" id="editImage">
+
+        <!-- PASSWORD -->
+        <input type="password" id="oldPassword" placeholder="Old Password">
+        <input type="password" id="newPassword" placeholder="New Password">
+        <input type="password" id="confirmPassword" placeholder="Confirm Password">
+
+        <button onclick="saveProfile()">Save Changes</button>
+    </div>
+
+</div>
+
+<script src="/public/dashboard.js"></script>
+
+</body>
+</html>
