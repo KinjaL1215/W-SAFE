@@ -7,6 +7,8 @@ npm install multer
 npm install dotenv
 
 
+git add .
+git commit -m "Initial commit"
 
 
 

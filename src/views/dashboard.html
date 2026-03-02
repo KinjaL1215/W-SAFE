@@ -17,10 +17,15 @@
             <img id="profileImg">
             <div id="avatar" class="avatar"></div>
             <span id="username">User</span>
+            <span class="chevron">▾</span>
         </div>
 
         <!-- DROPDOWN -->
         <div id="dropdown" class="dropdown">
+            <div class="dropdown-header">
+                <div id="dropdownAvatar" class="avatar small"></div>
+                <span id="dropdownName">User</span>
+            </div>
             <a href="#" onclick="openEditProfile()">Edit Profile</a>
             <a href="/logout">Logout</a>
         </div>
@@ -30,9 +35,9 @@
 <!-- MAIN -->
 <div class="container">
 
-    <h1>Dashboard</h1>
+    <h1 id="greeting">Dashboard</h1>
 
-    <div class="card emergency">
+    <div class="card emergency big">
         <h2>🚨 Emergency Help</h2>
         <button onclick="sendSOS()">Send SOS</button>
     </div>
@@ -86,6 +91,12 @@
 </div>
 
 <script src="/public/dashboard.js"></script>
+
+<script>
+    // update greeting text using username from localStorage
+    const name = localStorage.getItem('username') || 'User';
+    document.getElementById('greeting').innerText = `Welcome, ${name}!`;
+</script>
 
 </body>
 </html>

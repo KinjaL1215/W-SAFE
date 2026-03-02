@@ -6,6 +6,18 @@ const user = {
 };
 
 document.getElementById("username").innerText = `${user.name}`;
+// also fill dropdown header name/avatar
+const ddName = document.getElementById("dropdownName");
+if (ddName) ddName.innerText = user.name;
+const ddAvatar = document.getElementById("dropdownAvatar");
+if (ddAvatar) {
+    if (user.profilePic) {
+        ddAvatar.style.backgroundImage = `url('${user.profilePic}')`;
+        ddAvatar.style.backgroundSize = 'cover';
+    } else {
+        ddAvatar.innerText = user.name.charAt(0).toUpperCase();
+    }
+}
 
 // PROFILE IMAGE / AVATAR
 const img = document.getElementById("profileImg");

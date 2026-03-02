@@ -55,7 +55,11 @@ document.getElementById('signupForm').addEventListener('submit', async function(
     const result = await res.json();
     alert(result.message);
 
-    if (result.message.includes("successful")) {
+    if (result.success) {
+        // save for dashboard use
+        localStorage.setItem("username", result.username);
+        localStorage.setItem("email", result.email);
+        // account created – send to login or dashboard
         window.location.href = "/login";
     }
 });
