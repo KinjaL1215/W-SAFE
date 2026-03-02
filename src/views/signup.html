@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -11,28 +11,39 @@
 
 <div class="container">
     <h2>Welcome to W-SAFE</h2>
-    <p class = "paragraph">Create your account and stay protected with smart safety tools</p>
-   <form action="/signup" method="POST">
-    <label>Full Name</label>
-    <input type="text" name="username" placeholder="Enter your name" required>
+    <p class="paragraph">Create your account and stay protected with smart safety tools</p>
 
-    <label>Email</label>
-    <input type="email" name="email" placeholder="Enter email" required>
+    <form id="signupForm">
+        <label>Full Name</label>
+        <input type="text" name="username" required>
 
-    <label>Password</label>
-    <input type="password" name="password" placeholder="Enter password" required>
+        <label>Email</label>
+        <input type="email" name="email" required>
 
-    <label>Confirm Password</label>
-    <input type="password" name="confirmPassword" placeholder="Confirm password" required>
+        <label>Password</label>
+        <input type="password" name="password" required>
 
-    <button type="submit">Create Account</button>
+        <label>Confirm Password</label>
+        <input type="password" name="confirmPassword" required>
 
-    <p class="bottom-text">
-        Already have an account?
-        <a href="/login">Login</a>
-    </p>
-</form>
+        <!-- OTP -->
+        <label id="otpLabel" style="display:none;">Enter OTP</label>
+        <input type="text" id="otpInput" name="otp" style="display:none;">
+
+        <!-- Buttons -->
+        <div class="btn-group">
+            <button type="button" id="otpBtn" onclick="sendOTP()">Send OTP</button>
+            <button type="submit" id="signupBtn" style="display:none;">Create Account</button>
+        </div>
+
+        <p class="bottom-text">
+            Already have an account?
+            <a href="/login">Login</a>
+        </p>
+    </form>
 </div>
+
+<script src="/public/signup.js"></script>
 
 </body>
 </html>

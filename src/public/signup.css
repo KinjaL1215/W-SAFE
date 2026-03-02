@@ -112,3 +112,8 @@ button:active {
 .bottom-text a:hover {
     text-decoration: underline;
 }
+.btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
