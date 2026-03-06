@@ -56,6 +56,10 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
 });
 
+app.get('/logout', (req, res) => {
+  res.redirect('/api/logout');
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });

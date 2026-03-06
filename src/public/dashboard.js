@@ -234,11 +234,10 @@ function shareLocation() {
             const mapLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
             document.getElementById("locationLink").value = mapLink;
             
-            // Using standard Google Maps Embed (Requires HTTPS and no 'X-Frame-Options' block from Google)
-            // Note: Some browsers block direct Google embeds without an API key. 
-           const mapFrame = document.getElementById("mapFrame");
-
-mapFrame.src = `https://maps.google.com/maps?q=${latitude},${longitude}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+            const mapFrame = document.getElementById("mapFrame");
+            if (mapFrame) {
+                mapFrame.src = `https://www.google.com/maps?q=${latitude},${longitude}&output=embed`;
+            }
         },
         (error) => {
             document.getElementById("liveIndicator").innerHTML = "🔴 Location Error";
@@ -254,6 +253,10 @@ function stopLocationTracking() {
         locationWatchId = null;
     }
     document.getElementById("locationModal").style.display = "none";
+}
+
+function closeLocationModal() {
+    stopLocationTracking();
 }
 
 function copyLocationLink() {

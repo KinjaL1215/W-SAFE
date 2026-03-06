@@ -245,13 +245,13 @@ exports.logout = (req, res) => {
     <html>
     <head>
       <title>Logging out...</title>
-      <meta http-equiv="refresh" content="1;url=/login">
+      <meta http-equiv="refresh" content="1;url=/">
     </head>
     <body>
       <script>
         localStorage.clear();
         sessionStorage.clear();
-        window.location.href = '/login';
+        window.location.href = '/';
       </script>
     </body>
     </html>
