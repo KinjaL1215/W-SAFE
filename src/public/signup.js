@@ -7,7 +7,7 @@ async function sendOTP() {
         return;
     }
 
-    const res = await fetch('/send-otp', {
+    const res = await fetch('/api/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
@@ -46,7 +46,7 @@ document.getElementById('signupForm').addEventListener('submit', async function(
     const formData = new FormData(this);
     const data = Object.fromEntries(formData);
 
-    const res = await fetch('/signup', {
+    const res = await fetch('/api/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -57,8 +57,8 @@ document.getElementById('signupForm').addEventListener('submit', async function(
 
     if (result.success) {
         // save for dashboard use
-        localStorage.setItem("username", result.username);
-        localStorage.setItem("email", result.email);
+        localStorage.setItem("username", result.data.username);
+        localStorage.setItem("email", result.data.email);
         // account created – send to login or dashboard
         window.location.href = "/login";
     }

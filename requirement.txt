@@ -5,11 +5,11 @@ npm i mongoose
 npm install bcrypt
 npm install multer
 npm install dotenv
-
+npm install nodemailer
 
 git add .
 git commit -m "Initial commit"
-
+git push origin main
 
 
 

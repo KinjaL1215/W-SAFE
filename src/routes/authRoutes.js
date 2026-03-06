@@ -1,111 +1,69 @@
+/**
+ * Authentication Routes
+ * 
+ * This module contains all authentication-related API endpoints
+ * - OTP generation and verification
+ * - User registration (signup)
+ * - User authentication (login)
+ * - Password management
+ */
+
 const express = require('express');
 const router = express.Router();
-const nodemailer = require('nodemailer');
-const bcrypt = require('bcrypt');
+const authController = require('../controllers/authController');
 
-const User = require('../models/User');
+/**
+ * @route   POST /api/send-otp
+ * @desc    Send OTP to user's email for verification
+ * @access  Public
+ * @body    { email: string }
+ * @returns { success: boolean, message: string }
+ */
+router.post('/send-otp', authController.sendOtp);
 
-// In-memory OTP store (simple)
-let otpStore = {};
+/**
+ * @route   POST /api/signup
+ * @desc    Register a new user with email verification
+ * @access  Public
+ * @body    {
+ *            username: string,
+ *            email: string,
+ *            password: string,
+ *            confirmPassword: string,
+ *            otp: string
+ *          }
+ * @returns { success: boolean, message: string, data: object }
+ */
+router.post('/signup', authController.signup);
 
-// Nodemailer setup
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
+/**
+ * @route   POST /api/login
+ * @desc    Authenticate user and log them in
+ * @access  Public
+ * @body    { email: string, password: string }
+ * @returns { success: boolean, message: string, data: object }
+ */
+router.post('/login', authController.login);
 
-// Send OTP
-router.post('/send-otp', async (req, res) => {
-  const { email } = req.body;
-  if (!email) return res.json({ success: false, message: 'Email is required' });
+/**
+ * @route   POST /api/change-password
+ * @desc    Change user's password
+ * @access  Private (authenticated)
+ * @body    {
+ *            email: string,
+ *            oldPassword: string,
+ *            newPassword: string
+ *          }
+ * @returns { success: boolean, message: string }
+ */
+router.post('/change-password', authController.changePassword);
 
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  otpStore[email] = otp;
-
-  try {
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'Your OTP - W-SAFE',
-      text: `Your OTP is ${otp}`
-    });
-
-    return res.json({ success: true, message: 'OTP Sent Successfully' });
-  } catch (err) {
-    console.error('OTP send error:', err);
-    return res.json({ success: false, message: 'Error sending OTP' });
-  }
-});
-
-// Signup
-router.post('/signup', async (req, res) => {
-  try {
-    const { username, email, password, confirmPassword, otp } = req.body;
-
-    if (!email || !password) return res.json({ success: false, message: 'Email and password required' });
-
-    if (otpStore[email] !== otp) return res.json({ success: false, message: 'Invalid OTP ❌' });
-
-    if (password !== confirmPassword) return res.json({ success: false, message: 'Passwords do not match ❌' });
-
-    const exists = await User.findOne({ email });
-    if (exists) return res.json({ success: false, message: 'Email already exists ❌' });
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ username, email, password: hashedPassword });
-
-    delete otpStore[email];
-
-    return res.json({ success: true, message: 'Signup successful', username: user.username, email: user.email });
-  } catch (err) {
-    console.error('Signup error:', err);
-    return res.json({ success: false, message: 'Signup failed' });
-  }
-});
-
-// Login
-router.post('/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    if (!email || !password) return res.json({ success: false, message: 'Email and password required' });
-
-    const user = await User.findOne({ email });
-    if (!user) return res.json({ success: false, message: 'User not found ❌' });
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.json({ success: false, message: 'Wrong Password ❌' });
-
-    return res.json({ success: true, message: 'Login successful', username: user.username, email: user.email });
-  } catch (err) {
-    console.error('Login error:', err);
-    return res.json({ success: false, message: 'Login failed' });
-  }
-});
-
-// Change password
-router.post('/change-password', async (req, res) => {
-  try {
-    const { email, oldPassword, newPassword } = req.body;
-    if (!email) return res.status(400).json({ success: false, message: 'Email required' });
-
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
-
-    const ok = await bcrypt.compare(oldPassword, user.password);
-    if (!ok) return res.status(401).json({ success: false, message: 'Old password incorrect' });
-
-    const hashed = await bcrypt.hash(newPassword, 10);
-    user.password = hashed;
-    await user.save();
-
-    return res.json({ success: true, message: 'Password changed' });
-  } catch (err) {
-    console.error('Change password error:', err);
-    return res.status(500).json({ success: false, message: 'Could not change password' });
-  }
-});
+/**
+ * @route   GET /api/logout
+ * @desc    Logout user and clear session
+ * @access  Private (authenticated)
+ * @returns { HTML redirect to login page }
+ */
+router.get('/logout', authController.logout);
 
 module.exports = router;

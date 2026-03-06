@@ -6,7 +6,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     const formData = new FormData(this);
     const data = Object.fromEntries(formData);
 
-    const res = await fetch('/login', {
+    const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -16,8 +16,8 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     alert(result.message);
 
     if (result.success) {
-        localStorage.setItem('username', result.username);
-        localStorage.setItem('email', result.email);
+        localStorage.setItem('username', result.data.username);
+        localStorage.setItem('email', result.data.email);
         window.location.href = '/dashboard';
     }
 });

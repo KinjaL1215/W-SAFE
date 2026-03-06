@@ -2,6 +2,9 @@
 <html>
 <head>
     <title>W-SAFE Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/public/dashboard.css">
 </head>
 <body>
@@ -11,8 +14,6 @@
     <h2>W-SAFE</h2>
 
     <div class="nav-right">
-
-        <!-- PROFILE -->
         <div class="profile" onclick="toggleMenu()">
             <img id="profileImg">
             <div id="avatar" class="avatar"></div>
@@ -20,7 +21,6 @@
             <span class="chevron">▾</span>
         </div>
 
-        <!-- DROPDOWN -->
         <div id="dropdown" class="dropdown">
             <div class="dropdown-header">
                 <div id="dropdownAvatar" class="avatar small"></div>
@@ -37,9 +37,13 @@
 
     <h1 id="greeting">Dashboard</h1>
 
+    <!-- SOS -->
     <div class="card emergency big">
-        <h2>🚨 Emergency Help</h2>
-        <button onclick="sendSOS()">Send SOS</button>
+        <div class="sos-header">
+            <h2>🚨 Emergency Help</h2>
+            <p class="muted">Quickly notify your trusted contacts with your live location</p>
+        </div>
+        <button id="sosBtn" class="sos-button">Send SOS</button>
     </div>
 
     <div class="grid">
@@ -49,51 +53,250 @@
         </div>
 
         <div class="card">
-            <h3>📞 Emergency Contacts</h3>
-            <button>View</button>
-        </div>
-
-        <div class="card">
             <h3>🛡 Safety Tips</h3>
-            <button>Read</button>
+            <button onclick="openSafetyTips()">Read</button>
         </div>
 
         <div class="card">
-            <h3>📢 Report Incident</h3>
-            <button>Report</button>
+            <h3>☎️ Emergency Numbers</h3>
+            <button onclick="openEmergencyNumbers()">View</button>
         </div>
     </div>
 
 </div>
 
+<!-- EMERGENCY NUMBERS MODAL -->
+<div id="emergencyNumbersModal" class="modal">
+    <div class="modal-content" style="max-width: 85%; max-height: 85vh;">
+        <div class="modal-header">
+            <h2 style="font-size: 28px; color: #d32f2f;">☎️ Emergency Numbers</h2>
+            <span class="close" onclick="closeEmergencyNumbers()" style="font-size: 28px;">&times;</span>
+        </div>
+        <div style="max-height: calc(85vh - 100px); overflow-y: auto; padding: 20px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                
+                <!-- Emergency SOS - 112 -->
+                <div style="background: linear-gradient(135deg, #ffebee 0%, #fff5f7 100%); padding: 20px; border-radius: 12px; border-left: 6px solid #d32f2f; box-shadow: 0 4px 12px rgba(211, 47, 47, 0.15);">
+                    <h3 style="color: #d32f2f; font-size: 20px; margin: 0 0 12px 0;">🚨 National Emergency</h3>
+                    <div style="font-size: 24px; font-weight: bold; color: #d32f2f; margin-bottom: 8px;">112</div>
+                    <p style="margin: 0; color: #666; font-size: 14px; line-height: 1.6;">Police, Ambulance, Fire Emergency - Available 24/7</p>
+                </div>
+
+                <!-- Police Emergency -->
+                <div style="background: linear-gradient(135deg, #ffe5e5 0%, #fff9f9 100%); padding: 20px; border-radius: 12px; border-left: 6px solid #c62828; box-shadow: 0 4px 12px rgba(198, 40, 40, 0.15);">
+                    <h3 style="color: #c62828; font-size: 20px; margin: 0 0 12px 0;">🚔 Police Emergency</h3>
+                    <div style="font-size: 24px; font-weight: bold; color: #c62828; margin-bottom: 8px;">100</div>
+                    <p style="margin: 0; color: #666; font-size: 14px; line-height: 1.6;">Police assistance for crimes and emergencies</p>
+                </div>
+
+                <!-- Ambulance Service -->
+                <div style="background: linear-gradient(135deg, #fff3e0 0%, #fff9f0 100%); padding: 20px; border-radius: 12px; border-left: 6px solid #ff6f00; box-shadow: 0 4px 12px rgba(255, 111, 0, 0.15);">
+                    <h3 style="color: #ff6f00; font-size: 20px; margin: 0 0 12px 0;">🚑 Ambulance Service</h3>
+                    <div style="font-size: 24px; font-weight: bold; color: #ff6f00; margin-bottom: 8px;">108</div>
+                    <p style="margin: 0; color: #666; font-size: 14px; line-height: 1.6;">Medical emergencies and health crisis assistance</p>
+                </div>
+
+                <!-- Women Helpline -->
+                <div style="background: linear-gradient(135deg, #f3e5f5 0%, #faf6ff 100%); padding: 20px; border-radius: 12px; border-left: 6px solid #7b1fa2; box-shadow: 0 4px 12px rgba(123, 31, 162, 0.15);">
+                    <h3 style="color: #7b1fa2; font-size: 20px; margin: 0 0 12px 0;">👩 National Women Helpline</h3>
+                    <div style="font-size: 24px; font-weight: bold; color: #7b1fa2; margin-bottom: 8px;">181</div>
+                    <p style="margin: 0; color: #666; font-size: 14px; line-height: 1.6;">24×7 support and counselling for women - Available across India</p>
+                </div>
+
+                <!-- Women Police Helpline -->
+                <div style="background: linear-gradient(135deg, #e3f2fd 0%, #f3f5ff 100%); padding: 20px; border-radius: 12px; border-left: 6px solid #1976d2; box-shadow: 0 4px 12px rgba(25, 118, 210, 0.15);">
+                    <h3 style="color: #1976d2; font-size: 20px; margin: 0 0 12px 0;">🛡️ Women Police Helpline</h3>
+                    <div style="font-size: 24px; font-weight: bold; color: #1976d2; margin-bottom: 8px;">1091</div>
+                    <p style="margin: 0; color: #666; font-size: 14px; line-height: 1.6;">Dedicated police support for women safety and emergencies</p>
+                </div>
+
+                <!-- Child Helpline -->
+                <div style="background: linear-gradient(135deg, #fce4ec 0%, #fff5fa 100%); padding: 20px; border-radius: 12px; border-left: 6px solid #c2185b; box-shadow: 0 4px 12px rgba(194, 24, 91, 0.15);">
+                    <h3 style="color: #c2185b; font-size: 20px; margin: 0 0 12px 0;">👶 Child Helpline</h3>
+                    <div style="font-size: 24px; font-weight: bold; color: #c2185b; margin-bottom: 8px;">1098</div>
+                    <p style="margin: 0; color: #666; font-size: 14px; line-height: 1.6;">Support for child safety, abuse, and welfare concerns</p>
+                </div>
+
+                <!-- Cyber Crime Helpline -->
+                <div style="background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f6 100%); padding: 20px; border-radius: 12px; border-left: 6px solid #388e3c; box-shadow: 0 4px 12px rgba(56, 142, 60, 0.15);">
+                    <h3 style="color: #388e3c; font-size: 20px; margin: 0 0 12px 0;">💻 Cyber Crime Helpline</h3>
+                    <div style="font-size: 24px; font-weight: bold; color: #388e3c; margin-bottom: 8px;">1930</div>
+                    <p style="margin: 0; color: #666; font-size: 14px; line-height: 1.6;">Report online harassment, cyber bullying, and digital threats</p>
+                </div>
+
+                <!-- NCW Helpline -->
+                <div style="background: linear-gradient(135deg, #ffeaa7 0%, #fff4d3 100%); padding: 20px; border-radius: 12px; border-left: 6px solid #f39c12; box-shadow: 0 4px 12px rgba(243, 156, 18, 0.15);">
+                    <h3 style="color: #f39c12; font-size: 20px; margin: 0 0 12px 0;">⚖️ NCW Helpline</h3>
+                    <div style="font-size: 24px; font-weight: bold; color: #f39c12; margin-bottom: 8px;">7827170170</div>
+                    <p style="margin: 0; color: #666; font-size: 14px; line-height: 1.6;">National Commission for Women - Legal support and assistance</p>
+                </div>
+
+            </div>
+
+            <div style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #f8f7fb 0%, #fafbfd 100%); border-left: 6px solid #e04f7a; border-radius: 8px;">
+                <p style="margin: 0; font-size: 15px; line-height: 1.8;">
+                    <strong style="color: #e04f7a; font-size: 16px;">⚠️ Important:</strong> If you're in immediate danger, always call 112 first. All these numbers are available 24/7 across India. All calls are confidential and free. If you can't talk, you can send an SMS to most of these services. Keep this page bookmarked for quick access in emergencies. Your safety is our priority.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SAFETY TIPS MODAL -->
+<div id="safetyTipsModal" class="modal">
+    <div class="modal-content" style="max-width: 90%; max-height: 90vh;">
+        <div class="modal-header">
+            <h2 style="font-size: 28px; color: #e04f7a;">🛡️ Safety Tips & Guidelines</h2>
+            <span class="close" onclick="closeSafetyTips()" style="font-size: 28px;">&times;</span>
+        </div>
+        <div style="max-height: calc(90vh - 100px); overflow-y: auto; padding: 20px;">
+            <div style="padding: 12px 0;">
+                
+                <div style="background: linear-gradient(135deg, #ffe5ed 0%, #fff5f9 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 6px solid #e04f7a;">
+                    <h3 style="color: #e04f7a; font-size: 22px; margin: 0 0 16px 0;">🚶 While Walking</h3>
+                    <ul style="margin-left: 20px; line-height: 2.2; font-size: 15px; padding: 0;">
+                        <li>✓ Stay aware of your surroundings and trust your instincts</li>
+                        <li>✓ Keep your phone charged and easily accessible</li>
+                        <li>✓ Walk with confidence and maintain good posture</li>
+                        <li>✓ Avoid using headphones in one ear — keep awareness</li>
+                        <li>✓ Share your location with trusted friends/family</li>
+                        <li>✓ Use well-lit, populated routes when possible</li>
+                        <li>✓ Walk in pairs or groups whenever you can</li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f6 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 6px solid #7b61f6;">
+                    <h3 style="color: #7b61f6; font-size: 22px; margin: 0 0 16px 0;">🚗 Vehicle Safety</h3>
+                    <ul style="margin-left: 20px; line-height: 2.2; font-size: 15px; padding: 0;">
+                        <li>✓ Check around and under your car before approaching</li>
+                        <li>✓ Have keys ready before reaching your car</li>
+                        <li>✓ Lock doors immediately after entering</li>
+                        <li>✓ Park in well-lit, visible areas</li>
+                        <li>✓ Never leave your engine running unattended</li>
+                        <li>✓ Keep valuables out of sight in your car</li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #e3f2fd 0%, #f3f5ff 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 6px solid #2196f3;">
+                    <h3 style="color: #2196f3; font-size: 22px; margin: 0 0 16px 0;">📱 Digital Safety</h3>
+                    <ul style="margin-left: 20px; line-height: 2.2; font-size: 15px; padding: 0;">
+                        <li>✓ Review privacy settings on social media regularly</li>
+                        <li>✓ Don't share your real-time location publicly online</li>
+                        <li>✓ Be cautious about meeting strangers from apps</li>
+                        <li>✓ Tell someone where you're going and when you'll be back</li>
+                        <li>✓ Use strong, unique passwords for all accounts</li>
+                        <li>✓ Be aware of phishing and scam attempts</li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #fff3e0 0%, #fff9f0 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 6px solid #ff9800;">
+                    <h3 style="color: #ff9800; font-size: 22px; margin: 0 0 16px 0;">🏠 Home Safety</h3>
+                    <ul style="margin-left: 20px; line-height: 2.2; font-size: 15px; padding: 0;">
+                        <li>✓ Always lock doors and windows, even when home</li>
+                        <li>✓ Use a door peephole or camera before opening</li>
+                        <li>✓ Don't let neighbors or strangers into your building</li>
+                        <li>✓ Change locks after a breakup or loss of keys</li>
+                        <li>✓ Install motion-sensor lights outside</li>
+                        <li>✓ Tell trusted people about unexpected visitors</li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #ffebee 0%, #fff5f7 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 6px solid #d32f2f;">
+                    <h3 style="color: #d32f2f; font-size: 22px; margin: 0 0 16px 0;">🆘 In an Emergency</h3>
+                    <ul style="margin-left: 20px; line-height: 2.2; font-size: 15px; padding: 0;">
+                        <li>🚨 <strong>Call emergency services (911 in US) immediately</strong></li>
+                        <li>✓ Use W-SAFE's SOS feature to alert emergency contacts</li>
+                        <li>✓ Share your live location with trusted contacts</li>
+                        <li>✓ Try to remember details about threats (description, vehicle, etc.)</li>
+                        <li>✓ Move to a safe, public place if possible</li>
+                        <li>✓ Don't confront an attacker — prioritize your safety</li>
+                        <li>✓ Seek help from police, store staff, or other people nearby</li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #f3e5f5 0%, #faf6ff 100%); padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 6px solid #7b1fa2;">
+                    <h3 style="color: #7b1fa2; font-size: 22px; margin: 0 0 16px 0;">💪 Self-Defense Tips</h3>
+                    <ul style="margin-left: 20px; line-height: 2.2; font-size: 15px; padding: 0;">
+                        <li>✓ Take a self-defense class to build confidence and skills</li>
+                        <li>✓ The most important defense is awareness and avoidance</li>
+                        <li>✓ If attacked, make noise and draw attention</li>
+                        <li>✓ Target vulnerable areas (eyes, throat, instep) if necessary</li>
+                        <li>✓ Use your voice firmly — say "No!" with authority</li>
+                        <li>✓ Run toward people and lit areas if being followed</li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: 20px; padding: 18px 20px; background: linear-gradient(135deg, #f8f7fb 0%, #fafbfd 100%); border-left: 6px solid #e04f7a; border-radius: 8px; border-top: 2px solid #e04f7a;">
+                    <p style="margin: 0; font-size: 15px; line-height: 1.8;">
+                        <strong style="color: #e04f7a; font-size: 16px;">🛡️ Remember:</strong> Your safety and well-being are paramount. Trust your gut feeling, stay alert, and always prioritize getting to safety. W-SAFE is here to help you quickly connect with emergency contacts when you need them most.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- LOCATION SHARING MODAL -->
+<div id="locationModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>📍 Live Location Tracker</h2>
+            <span class="close" onclick="closeLocationModal()">&times;</span>
+        </div>
+        <p style="text-align: center; color: #e04f7a; font-weight: 600; margin: 8px 0;"><span id="liveIndicator">🔴 Getting location...</span></p>
+        <div id="mapContainer" style="width: 100%; height: 300px; border-radius: 10px; margin: 16px 0;">
+           <iframe
+    id="mapFrame"
+    width="100%"
+    height="300"
+    style="border:0;border-radius:10px"
+    loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade">
+</iframe>
+        </div>
+        <div id="locationInfo">
+            <p><strong>📌 Live Coordinates:</strong> <span id="coordsDisplay">Fetching...</span></p>
+            <p style="font-size: 0.9rem; color: #6b6b6b;">Accuracy: <span id="accuracyDisplay">--</span> meters</p>
+            <input type="text" id="locationLink" placeholder="Location link" readonly style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #e9e5f6; margin: 12px 0;">
+            <button onclick="copyLocationLink()" style="width: 100%; margin-bottom: 8px;">📋 Copy Link</button>
+            <button onclick="shareLocationWithContacts()" style="width: 100%; margin-bottom: 8px;">✉️ Share with Emergency Contacts</button>
+            <button onclick="stopLocationTracking()" style="width: 100%; background: #ff6b6b;">⏹️ Stop Tracking</button>
+        </div>
+    </div>
+</div>
+
 <!-- EDIT PROFILE MODAL -->
 <div id="editModal" class="modal">
-
     <div class="modal-content">
+
+        <!-- HEADER -->
+        <div class="modal-header">
+            <h2>Edit Profile</h2>
+            <button class="save-email-btn" onclick="saveAllEmails()">Save Emails</button>
+        </div>
+
         <span class="close" onclick="closeEditProfile()">&times;</span>
 
-        <h2>Edit Profile</h2>
-
-        <!-- NAME -->
         <input type="text" id="editName" placeholder="Enter new name">
-
-        <!-- IMAGE -->
         <input type="file" id="editImage">
 
-        <!-- PASSWORD -->
-        <input type="password" id="oldPassword" placeholder="Old Password">
-        <input type="password" id="newPassword" placeholder="New Password">
-        <input type="password" id="confirmPassword" placeholder="Confirm Password">
+        <!-- Password change removed from profile modal -->
+        <!-- EMAIL SECTION -->
+        <h3>Emergency Emails</h3>
+
+        <input type="email" id="newEmergencyEmail" placeholder="Enter email">
+        <button onclick="addEmergencyEmail()">Add</button>
+
+        <ul id="savedEmails"></ul>
 
         <button onclick="saveProfile()">Save Changes</button>
-    </div>
 
+    </div>
 </div>
 
 <script src="/public/dashboard.js"></script>
 
 <script>
-    // update greeting text using username from localStorage
     const name = localStorage.getItem('username') || 'User';
     document.getElementById('greeting').innerText = `Welcome, ${name}!`;
 </script>
