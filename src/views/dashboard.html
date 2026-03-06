@@ -23,6 +23,7 @@
 
         <div id="dropdown" class="dropdown">
             <div class="dropdown-header">
+                <img id="dropdownProfileImg" class="dropdown-profile-img" alt="Profile">
                 <div id="dropdownAvatar" class="avatar small"></div>
                 <span id="dropdownName">User</span>
             </div>
@@ -278,7 +279,8 @@
         <span class="close" onclick="closeEditProfile()">&times;</span>
 
         <input type="text" id="editName" placeholder="Enter new name">
-        <input type="file" id="editImage">
+        <input type="file" id="editImage" accept="image/*">
+        <button type="button" class="delete-profile-btn" onclick="deleteProfilePicture()">Delete Profile Picture</button>
 
         <!-- Password change removed from profile modal -->
         <!-- EMAIL SECTION -->

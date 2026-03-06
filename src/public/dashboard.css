@@ -72,6 +72,7 @@
     height: 42px;
     border-radius: 50%;
     display: none;
+    object-fit: cover;
 }
 
 /* AVATAR */
@@ -112,6 +113,15 @@
 .dropdown-header .avatar.small {
     width: 36px;
     height: 36px;
+}
+
+.dropdown-profile-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: none;
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,0.7);
 }
 
 .dropdown a {
@@ -345,6 +355,10 @@ button:hover {
     font-size: 14px;
     border-radius: 12px;
     border: none;
+}
+
+.delete-profile-btn {
+    background: linear-gradient(90deg, #ef5350, #e53935);
 }
 
 #savedEmails li {

@@ -12,20 +12,110 @@ if (usernameDisplay) usernameDisplay.innerText = user.name;
 const img = document.getElementById("profileImg");
 const avatar = document.getElementById("avatar");
 const dropdownAvatar = document.getElementById('dropdownAvatar');
+const dropdownImg = document.getElementById('dropdownProfileImg');
 const dropdownName = document.getElementById('dropdownName');
+const editNameInput = document.getElementById("editName");
+const editImageInput = document.getElementById("editImage");
+
+const ALLOWED_IMAGE_TYPES = [
+    "image/png",
+    "image/jpeg",
+    "image/jpg",
+    "image/webp",
+    "image/gif"
+];
+
+function clearProfilePicture(showAlert = false) {
+    localStorage.removeItem("profilePic");
+    user.profilePic = "";
+    updateProfileUI();
+    if (editImageInput) editImageInput.value = "";
+    if (showAlert) alert("Profile picture deleted.");
+}
+
+function fileToDataUrl(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("Failed to read selected image."));
+        reader.readAsDataURL(file);
+    });
+}
+
+function downscaleImage(dataUrl, maxSize = 720, outputType = "image/webp", quality = 0.82) {
+    return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => {
+            const ratio = Math.min(1, maxSize / Math.max(image.width, image.height));
+            const width = Math.max(1, Math.round(image.width * ratio));
+            const height = Math.max(1, Math.round(image.height * ratio));
+
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+
+            const ctx = canvas.getContext("2d");
+            if (!ctx) {
+                reject(new Error("Image processing is not supported in this browser."));
+                return;
+            }
+
+            ctx.drawImage(image, 0, 0, width, height);
+            try {
+                resolve(canvas.toDataURL(outputType, quality));
+            } catch (err) {
+                reject(new Error("Could not optimize image."));
+            }
+        };
+        image.onerror = () => reject(new Error("Invalid image file."));
+        image.src = dataUrl;
+    });
+}
+
+function saveProfilePictureWithFallbacks(rawDataUrl) {
+    const variants = [
+        Promise.resolve(rawDataUrl),
+        downscaleImage(rawDataUrl, 900, "image/webp", 0.86),
+        downscaleImage(rawDataUrl, 720, "image/webp", 0.82),
+        downscaleImage(rawDataUrl, 560, "image/webp", 0.78)
+    ];
+
+    return variants.reduce(async (previousAttempt, currentAttempt) => {
+        const previous = await previousAttempt;
+        if (previous) return previous;
+
+        try {
+            const candidate = await currentAttempt;
+            localStorage.setItem("profilePic", candidate);
+            return candidate;
+        } catch (err) {
+            return null;
+        }
+    }, Promise.resolve(null));
+}
 
 function updateProfileUI() {
     if (user.profilePic) {
         if (img) { img.src = user.profilePic; img.style.display = "block"; }
+        if (dropdownImg) { dropdownImg.src = user.profilePic; dropdownImg.style.display = "block"; }
         if (avatar) avatar.style.display = "none";
         if (dropdownAvatar) dropdownAvatar.style.display = 'none';
     } else {
         const initial = user.name.charAt(0).toUpperCase();
         if (avatar) { avatar.innerText = initial; avatar.style.display = "flex"; }
         if (img) img.style.display = "none";
+        if (dropdownImg) dropdownImg.style.display = "none";
         if (dropdownAvatar) { dropdownAvatar.innerText = initial; dropdownAvatar.style.display = 'flex'; }
     }
     if (dropdownName) dropdownName.innerText = user.name;
+}
+
+if (img) {
+    img.onerror = () => clearProfilePicture();
+}
+
+if (dropdownImg) {
+    dropdownImg.onerror = () => clearProfilePicture();
 }
 
 updateProfileUI();
@@ -44,6 +134,8 @@ function toggleMenu() {
 // ================= MODAL =================
 function openEditProfile() {
     document.getElementById("editModal").style.display = "flex";
+    if (editNameInput) editNameInput.value = user.name || "";
+    if (editImageInput) editImageInput.value = "";
     displayEmergencyEmails();
 }
 
@@ -130,31 +222,55 @@ async function removeEmergencyEmail(id) {
     }
 }
 
-function saveProfile() {
-    const newName = document.getElementById("editName").value;
-    const imageInput = document.getElementById("editImage");
+async function saveProfile() {
+    const newName = editNameInput?.value.trim();
+    const imageFile = editImageInput?.files?.[0];
+    let changed = false;
 
     if (newName) {
         localStorage.setItem("username", newName);
         user.name = newName;
+        changed = true;
     }
 
-    if (imageInput && imageInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function () {
-            localStorage.setItem("profilePic", reader.result);
-            user.profilePic = reader.result;
-            updateProfileUI();
-            alert("Profile updated ✅");
-        };
-        reader.readAsDataURL(imageInput.files[0]);
-    } else {
-        updateProfileUI();
-        alert("Profile updated ✅");
+    if (imageFile) {
+        if (!ALLOWED_IMAGE_TYPES.includes((imageFile.type || "").toLowerCase())) {
+            alert("Please upload PNG, JPG, JPEG, WEBP, or GIF image.");
+            return;
+        }
+
+        try {
+            const rawDataUrl = await fileToDataUrl(imageFile);
+            const savedImage = await saveProfilePictureWithFallbacks(rawDataUrl);
+            if (!savedImage) {
+                alert("Could not save image. Please try a smaller PNG/JPG file.");
+                return;
+            }
+            user.profilePic = savedImage;
+            changed = true;
+        } catch (err) {
+            alert("Failed to process selected image.");
+            return;
+        }
     }
+
+    updateProfileUI();
     closeEditProfile();
+    alert(changed ? "Profile updated." : "No changes to save.");
 }
 
+function deleteProfilePicture() {
+    if (!user.profilePic) {
+        alert("No profile picture to delete.");
+        return;
+    }
+    clearProfilePicture(true);
+}
+
+function saveAllEmails() {
+    displayEmergencyEmails();
+    alert("Use Add/Delete to manage emails. Changes are saved automatically.");
+}
 // ================= SOS LOGIC =================
 const sosBtn = document.getElementById("sosBtn");
 if (sosBtn) sosBtn.addEventListener("click", sendSOS);
@@ -294,3 +410,4 @@ function closeSafetyTips() { document.getElementById("safetyTipsModal").style.di
 function openEmergencyNumbers() { document.getElementById("emergencyNumbersModal").style.display = "flex"; }
 function closeEmergencyNumbers() { document.getElementById("emergencyNumbersModal").style.display = "none"; }
 function callNumber(num) { window.location.href = "tel:" + num; }
+
