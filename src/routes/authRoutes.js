@@ -59,6 +59,22 @@ router.post('/login', authController.login);
 router.post('/change-password', authController.changePassword);
 
 /**
+ * @route   GET /api/profile
+ * @desc    Get user profile by email
+ * @access  Private (email-based for now)
+ * @query   { email: string }
+ */
+router.get('/profile', authController.getProfile);
+
+/**
+ * @route   PUT /api/profile
+ * @desc    Update user profile fields (username, image)
+ * @access  Private (email-based for now)
+ * @body    { email: string, username?: string, image?: string }
+ */
+router.put('/profile', authController.updateProfile);
+
+/**
  * @route   GET /api/logout
  * @desc    Logout user and clear session
  * @access  Private (authenticated)

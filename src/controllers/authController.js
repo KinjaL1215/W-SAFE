@@ -176,7 +176,8 @@ exports.login = async (req, res) => {
     sendSuccess(res, 200, 'Login successful', {
       userId: user._id,
       username: user.username,
-      email: user.email
+      email: user.email,
+      image: user.image || ''
     });
   } catch (err) {
     console.error('Login error:', err);
@@ -256,4 +257,88 @@ exports.logout = (req, res) => {
     </body>
     </html>
   `);
+};
+
+/**
+ * Get profile by email
+ * @route GET /api/profile?email=<email>
+ */
+exports.getProfile = async (req, res) => {
+  try {
+    const email = (req.query.email || '').toString().trim().toLowerCase();
+    if (!email) {
+      return sendValidationError(res, 'Email is required');
+    }
+
+    if (!isValidEmail(email)) {
+      return sendValidationError(res, 'Invalid email format');
+    }
+
+    const user = await User.findOne({ email }).select('username email image');
+    if (!user) {
+      return sendError(res, 404, 'User not found');
+    }
+
+    sendSuccess(res, 200, 'Profile fetched successfully', {
+      username: user.username,
+      email: user.email,
+      image: user.image || ''
+    });
+  } catch (err) {
+    console.error('Get profile error:', err);
+    sendError(res, 500, 'Failed to fetch profile');
+  }
+};
+
+/**
+ * Update profile fields
+ * @route PUT /api/profile
+ * @body { email, username?, image? }
+ */
+exports.updateProfile = async (req, res) => {
+  try {
+    const email = (req.body.email || '').toString().trim().toLowerCase();
+    const username = typeof req.body.username === 'string' ? req.body.username.trim() : undefined;
+    const image = typeof req.body.image === 'string' ? req.body.image : undefined;
+
+    if (!email) {
+      return sendValidationError(res, 'Email is required');
+    }
+
+    if (!isValidEmail(email)) {
+      return sendValidationError(res, 'Invalid email format');
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return sendError(res, 404, 'User not found');
+    }
+
+    if (username !== undefined) {
+      if (!isValidUsername(username)) {
+        return sendValidationError(res, 'Username must be 3-30 characters, alphanumeric only');
+      }
+      user.username = username;
+    }
+
+    if (image !== undefined) {
+      // Accept empty string (delete image) or data URL payloads
+      const isValidDataUrl = image === '' || /^data:image\/(png|jpeg|jpg|webp|gif);base64,[a-zA-Z0-9+/=]+$/.test(image);
+      if (!isValidDataUrl) {
+        return sendValidationError(res, 'Invalid profile image format');
+      }
+      user.image = image;
+    }
+
+    await user.save();
+
+    sendSuccess(res, 200, 'Profile updated successfully', {
+      username: user.username,
+      email: user.email,
+      image: user.image || ''
+    });
+  } catch (err) {
+    console.error('Update profile error:', err);
+    sendError(res, 500, 'Failed to update profile');
+  }
 };

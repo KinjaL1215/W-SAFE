@@ -18,6 +18,11 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     if (result.success) {
         localStorage.setItem('username', result.data.username);
         localStorage.setItem('email', result.data.email);
+        if (result.data.image) {
+            localStorage.setItem('profilePic', result.data.image);
+        } else {
+            localStorage.removeItem('profilePic');
+        }
         window.location.href = '/dashboard';
     }
 });

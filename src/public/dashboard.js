@@ -25,6 +25,15 @@ const ALLOWED_IMAGE_TYPES = [
     "image/gif"
 ];
 
+function safeSetLocalStorage(key, value) {
+    try {
+        localStorage.setItem(key, value);
+        return true;
+    } catch (err) {
+        return false;
+    }
+}
+
 function clearProfilePicture(showAlert = false) {
     localStorage.removeItem("profilePic");
     user.profilePic = "";
@@ -72,7 +81,7 @@ function downscaleImage(dataUrl, maxSize = 720, outputType = "image/webp", quali
     });
 }
 
-function saveProfilePictureWithFallbacks(rawDataUrl) {
+function buildProfilePictureWithFallbacks(rawDataUrl) {
     const variants = [
         Promise.resolve(rawDataUrl),
         downscaleImage(rawDataUrl, 900, "image/webp", 0.86),
@@ -86,7 +95,6 @@ function saveProfilePictureWithFallbacks(rawDataUrl) {
 
         try {
             const candidate = await currentAttempt;
-            localStorage.setItem("profilePic", candidate);
             return candidate;
         } catch (err) {
             return null;
@@ -95,6 +103,8 @@ function saveProfilePictureWithFallbacks(rawDataUrl) {
 }
 
 function updateProfileUI() {
+    if (usernameDisplay) usernameDisplay.innerText = user.name || "User";
+
     if (user.profilePic) {
         if (img) { img.src = user.profilePic; img.style.display = "block"; }
         if (dropdownImg) { dropdownImg.src = user.profilePic; dropdownImg.style.display = "block"; }
@@ -119,6 +129,36 @@ if (dropdownImg) {
 }
 
 updateProfileUI();
+
+async function syncProfileFromServer() {
+    if (!user.email) return;
+
+    try {
+        const res = await fetch(`/api/profile?email=${encodeURIComponent(user.email)}`);
+        const data = await res.json();
+        if (!res.ok || !data?.success || !data?.data) return;
+
+        const { username, image } = data.data;
+
+        if (username) {
+            user.name = username;
+            safeSetLocalStorage("username", username);
+        }
+
+        user.profilePic = image || "";
+        if (user.profilePic) {
+            safeSetLocalStorage("profilePic", user.profilePic);
+        } else {
+            localStorage.removeItem("profilePic");
+        }
+
+        updateProfileUI();
+    } catch (err) {
+        // Keep using localStorage fallback if API request fails.
+    }
+}
+
+syncProfileFromServer();
 
 // Pre-request geolocation permission
 if (navigator.geolocation) {
@@ -185,6 +225,15 @@ async function displayEmergencyEmails() {
     }
 }
 
+async function parseApiResponse(res) {
+    const contentType = res.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+        return await res.json();
+    }
+    const text = await res.text();
+    return { success: res.ok, message: text || "Unexpected server response." };
+}
+
 async function addEmergencyEmail() {
     const input = document.getElementById("newEmergencyEmail");
     const email = input?.value.trim();
@@ -225,12 +274,13 @@ async function removeEmergencyEmail(id) {
 async function saveProfile() {
     const newName = editNameInput?.value.trim();
     const imageFile = editImageInput?.files?.[0];
-    let changed = false;
+    const hasNameChange = Boolean(newName && newName !== user.name);
+    const hasImageChange = Boolean(imageFile);
+    let preparedImage = undefined;
 
-    if (newName) {
-        localStorage.setItem("username", newName);
-        user.name = newName;
-        changed = true;
+    if (!user.email) {
+        alert("Login required.");
+        return;
     }
 
     if (imageFile) {
@@ -241,30 +291,89 @@ async function saveProfile() {
 
         try {
             const rawDataUrl = await fileToDataUrl(imageFile);
-            const savedImage = await saveProfilePictureWithFallbacks(rawDataUrl);
-            if (!savedImage) {
-                alert("Could not save image. Please try a smaller PNG/JPG file.");
+            preparedImage = await buildProfilePictureWithFallbacks(rawDataUrl);
+            if (!preparedImage) {
+                alert("Could not process image. Please try a smaller PNG/JPG file.");
                 return;
             }
-            user.profilePic = savedImage;
-            changed = true;
         } catch (err) {
             alert("Failed to process selected image.");
             return;
         }
     }
 
-    updateProfileUI();
-    closeEditProfile();
-    alert(changed ? "Profile updated." : "No changes to save.");
+    if (!hasNameChange && !hasImageChange) {
+        closeEditProfile();
+        alert("No changes to save.");
+        return;
+    }
+
+    const payload = { email: user.email };
+    if (hasNameChange) payload.username = newName;
+    if (hasImageChange) payload.image = preparedImage;
+
+    try {
+        const res = await fetch('/api/profile', {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+        const data = await parseApiResponse(res);
+        if (!res.ok || !data?.success) {
+            if (res.status === 413) {
+                alert("Image is too large for upload. Please choose a smaller image.");
+                return;
+            }
+            alert(data?.message || "Failed to update profile.");
+            return;
+        }
+
+        const next = data.data || {};
+        user.name = next.username || user.name;
+        user.profilePic = next.image || "";
+
+        safeSetLocalStorage("username", user.name);
+        if (user.profilePic) {
+            safeSetLocalStorage("profilePic", user.profilePic);
+        } else {
+            localStorage.removeItem("profilePic");
+        }
+
+        updateProfileUI();
+        closeEditProfile();
+        alert("Profile updated.");
+    } catch (err) {
+        alert("Failed to update profile.");
+    }
 }
 
-function deleteProfilePicture() {
+async function deleteProfilePicture() {
     if (!user.profilePic) {
         alert("No profile picture to delete.");
         return;
     }
-    clearProfilePicture(true);
+
+    if (!user.email) {
+        alert("Login required.");
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/profile', {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: user.email, image: "" })
+        });
+        const data = await parseApiResponse(res);
+        if (!res.ok || !data?.success) {
+            alert(data?.message || "Failed to delete profile picture.");
+            return;
+        }
+
+        clearProfilePicture(true);
+    } catch (err) {
+        alert("Failed to delete profile picture.");
+    }
 }
 
 function saveAllEmails() {
